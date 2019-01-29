@@ -14,8 +14,7 @@ public struct GenericHash {
 extension GenericHash {
     public class Stream {
     #if compiler(>=5)
-        private var opaqueState: OpaquePointer
-        private var state: UnsafeMutableRawPointer!
+        private var state: UnsafeMutableRawBufferPointer
     #else
         private var state: crypto_generichash_state
     #endif
@@ -25,12 +24,10 @@ extension GenericHash {
         init?(key: Bytes?, outputLength: Int) {
 
         #if compiler(>=5)
-            state = sodium_malloc(crypto_generichash_statebytes())
-            guard let opaqueState = OpaquePointer(state) else { return nil }
-            self.opaqueState = opaqueState
+            state = UnsafeMutableRawBufferPointer.allocate(byteCount: crypto_generichash_statebytes(), alignment: 64)
 
             guard .SUCCESS == crypto_generichash_init(
-                opaqueState,
+                OpaquePointer(state.baseAddress),
                 key, key?.count ?? 0,
                 outputLength
             ).exitCode else { return nil }
@@ -49,7 +46,7 @@ extension GenericHash {
 
     #if compiler(>=5)
         deinit {
-            sodium_free(state)
+            state.deallocate()
         }
     #endif
     }
@@ -150,7 +147,7 @@ extension GenericHash.Stream {
     public func update(input: Bytes) -> Bool {
     #if compiler(>=5)
         return .SUCCESS == crypto_generichash_update(
-            opaqueState,
+            OpaquePointer(state.baseAddress),
             input, UInt64(input.count)
         ).exitCode
     #else
@@ -171,7 +168,7 @@ extension GenericHash.Stream {
         var output = Array<UInt8>(count: outputLen)
     #if compiler(>=5)
         guard .SUCCESS == crypto_generichash_final(
-            opaqueState,
+            OpaquePointer(state.baseAddress),
             &output, outputLen
         ).exitCode else { return nil }
     #else
