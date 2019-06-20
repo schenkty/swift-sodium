@@ -105,7 +105,7 @@ class ReadmeTests : XCTestCase {
         let sodium = Sodium()
         let message = "My Test Message".bytes
         let secretKey = sodium.secretBox.key()
-        let encrypted: Bytes = sodium.secretBox.seal(message: message, secretKey: secretKey)!
+        let encrypted: Bytes = sodium.secretBox.sealBytes(message: message, secretKey: secretKey)!
         if sodium.secretBox.open(nonceAndAuthenticatedCipherText: encrypted, secretKey: secretKey) != nil {
             // authenticator is valid, decrypted contains the original message
         }
@@ -180,8 +180,8 @@ class ReadmeTests : XCTestCase {
 
     func testZeroingMemory() {
         let sodium = Sodium()
-        var dataToZero = "Message".bytes
-        sodium.utils.zero(&dataToZero)
+        var dataToZero = "Message".toData()!
+		sodium.utils.zeroData(&dataToZero)
     }
 
     func testConstantTimeComparison() {

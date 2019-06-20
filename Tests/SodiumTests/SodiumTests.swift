@@ -96,11 +96,11 @@ class SodiumTests: XCTestCase {
         let secretKey = sodium.secretBox.key()
 
         // test simple nonce + mac + message box
-        let encrypted: Bytes = sodium.secretBox.seal(message: message, secretKey: secretKey)!
+        let encrypted: Bytes = sodium.secretBox.sealBytes(message: message, secretKey: secretKey)!
         let decrypted = sodium.secretBox.open(nonceAndAuthenticatedCipherText: encrypted, secretKey: secretKey)!
         XCTAssertEqual(decrypted, message)
 
-        XCTAssertNotEqual(sodium.secretBox.seal(message: message, secretKey: secretKey)!, encrypted, "Ciphertext of two encryption operations on the same plaintext shouldn't be equal. Make sure the nonce was used only once!")
+		XCTAssertNotEqual(sodium.secretBox.sealBytes(message: message, secretKey: secretKey), encrypted, "Ciphertext of two encryption operations on the same plaintext shouldn't be equal. Make sure the nonce was used only once!")
 
         XCTAssertNil(sodium.secretBox.open(nonceAndAuthenticatedCipherText: encrypted, secretKey: sodium.secretBox.key()), "Shouldn't be able to decrypt with a bad key")
 
@@ -204,18 +204,18 @@ class SodiumTests: XCTestCase {
     }
 
     func testUtils() {
-        var dataToZero = [1, 2, 3, 4] as [UInt8]
-        sodium.utils.zero(&dataToZero)
-        XCTAssert(dataToZero == [0, 0, 0, 0] as [UInt8])
+		var dataToZero: Bytes = [1, 2, 3, 4]
+        sodium.utils.zeroBytes(&dataToZero)
+        XCTAssert(dataToZero == [0, 0, 0, 0] as Bytes)
 
-        var dataToZero2 = [1, 2, 3, 4] as [UInt8]
-        sodium.utils.zero(&dataToZero2)
-        XCTAssert(dataToZero2 == [0, 0, 0, 0,] as [UInt8])
+		var dataToZero2: Bytes = [1, 2, 3, 4]
+		sodium.utils.zeroBytes(&dataToZero2)
+        XCTAssert(dataToZero2 == [0, 0, 0, 0,] as Bytes)
 
-        let eq1 = [1, 2, 3, 4] as [UInt8]
-        let eq2 = [1, 2, 3, 4] as [UInt8]
-        let eq3 = [1, 2, 3, 5] as [UInt8]
-        let eq4 = [1, 2, 3] as [UInt8]
+		let eq1: Bytes = [1, 2, 3, 4]
+		let eq2: Bytes = [1, 2, 3, 4]
+		let eq3: Bytes = [1, 2, 3, 5]
+		let eq4: Bytes = [1, 2, 3]
 
         XCTAssertTrue(sodium.utils.equals(eq1, eq2))
         XCTAssertFalse(sodium.utils.equals(eq1, eq3))
