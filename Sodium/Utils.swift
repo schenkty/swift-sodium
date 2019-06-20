@@ -18,7 +18,7 @@ extension Utils {
 
      - Parameter data: The `Bytes` object to zero.
      */
-    public func zero(_ data: inout Bytes)  {
+    public func zero(_ data: inout Data)  {
         let count = data.count
         sodium_memzero(&data, count)
     }
