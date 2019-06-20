@@ -15,7 +15,7 @@ extension SecretBox {
 
      - Returns: A `Bytes` object containing the nonce and authenticated ciphertext.
      */
-    public func seal(message: Bytes, secretKey: Key) -> Bytes? {
+    public func sealBytes(message: Bytes, secretKey: Key) -> Bytes? {
         guard let (authenticatedCipherText, nonce): (Bytes, Nonce) = seal(
             message: message,
             secretKey: secretKey
