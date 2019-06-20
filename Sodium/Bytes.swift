@@ -8,7 +8,7 @@ extension Array where Element == UInt8 {
     }
 
     public var utf8String: String? {
-        return String(data: Data(bytes: self), encoding: .utf8)
+        return String(data: Data.init(bytes: self, count: self.count), encoding: .utf8)
     }
 }
 
